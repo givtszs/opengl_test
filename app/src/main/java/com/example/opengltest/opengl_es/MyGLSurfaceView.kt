@@ -1,6 +1,5 @@
-package com.example.opengltest
+package com.example.opengltest.opengl_es
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.GLSurfaceView
 
