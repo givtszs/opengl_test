@@ -6,4 +6,9 @@
     <color name="secondary_700">#81008a</color>
     <color name="shape_color">#008a81</color>
 
+    <color name="primary">#6750A4</color>
+    <color name="secondary">#625B71</color>
+    <color name="tertiary">#7D5260</color>
+
+
 </resources>
