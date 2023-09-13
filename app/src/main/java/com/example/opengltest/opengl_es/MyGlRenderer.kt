@@ -4,6 +4,7 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import android.os.SystemClock
+import android.util.Log
 import com.example.opengltest.opengl_es.shapes.OpenGLShape
 import com.example.opengltest.opengl_es.shapes.Shapes
 import com.example.opengltest.opengl_es.shapes.Square
@@ -17,6 +18,9 @@ class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
     private val projectionMatrix = FloatArray(16)
     private val viewMatrix = FloatArray(16)
     private val rotationMatrix = FloatArray(16)
+
+    @Volatile
+    var angle: Float = 0f
 
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
         // set the background frame color
@@ -62,18 +66,20 @@ class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gL10: GL10?) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        Log.d("MyGlRenderer", "onDrawFrame is called")
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
 
+//        Matrix.setIdentityM(rotationMatrix, 0)
         // Set the camera position (View matrix)
         Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
 
-        // Calculate the projection and view transformation
+        // Calculate the projection and viZew transformation
         Matrix.multiplyMM(modelViewProjectionMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
 
         // Create a rotation transformation for the shape
-        val time = SystemClock.uptimeMillis() % 4000L
-        println("time: $time")
-        val angle = 0.090f * time.toInt()
+//        val time = SystemClock.uptimeMillis() % 4000L
+//        println("time: $time")
+//        angle = 0.090f * time.toInt()
         Matrix.setRotateM(rotationMatrix, 0, angle, 0f, 0f, -1.0f)
 
         // this matrix will hold the combination of rotation, view and projection matrices.
