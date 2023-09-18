@@ -1,5 +1,6 @@
 package com.example.opengltest.opengl_es
 
+import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
@@ -12,7 +13,9 @@ import com.example.opengltest.opengl_es.shapes.Triangle
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
+class MyGlRenderer(private val shapeType: String?,
+                   private val context: Context,
+) : GLSurfaceView.Renderer {
     private var shape: OpenGLShape? = null
     private val modelViewProjectionMatrix = FloatArray(16)
     private val projectionMatrix = FloatArray(16)
@@ -25,6 +28,9 @@ class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
         // set the background frame color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
+//        GLES20.glEnable(GLES20.GL_TEXTURE_2D)
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 
         // initialize shape
         shape = when (shapeType) {
@@ -35,6 +41,7 @@ class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
                         -0.3f, -0.31100425f, 0.0f,
                         0.3f, -0.31100425f, 0.0f
                     ),
+                    textureCoords = floatArrayOf(),
                     color = floatArrayOf(0.404f, 0.314f, 0.643f, 1.0f)
                 )
             }
@@ -42,10 +49,17 @@ class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
             Shapes.SQUARE.shapeName -> {
                 Square(
                     shapeCoords = floatArrayOf(
-                        -0.3f, 0.3f, 0.0f,
-                        -0.3f, -0.3f, 0.0f,
-                        0.3f, -0.3f, 0.0f,
-                        0.3f, 0.3f, 0.0f
+                        -0.3f, 0.3f, 0.0f,    // top left
+                        -0.3f, -0.3f, 0.0f,   // bottom left
+                        0.3f, -0.3f, 0.0f,    // bottom right
+                        0.3f, 0.3f, 0.0f      // top right
+                    ),
+                    textureCoords = floatArrayOf(
+                        //x,    y
+                        0.0f, 1.0f,
+                        0.0f, 0.0f,
+                        1.0f, 0.0f,
+                        1.0f, 1.0f,
                     ),
                     color = floatArrayOf(0.404f, 0.314f, 0.643f, 1.0f)
                 )
@@ -53,6 +67,8 @@ class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
 
             else -> null
         }
+
+        shape?.loadGlTexture(context)
     }
 
     override fun onSurfaceChanged(gL10: GL10?, width: Int, height: Int) {
@@ -91,6 +107,6 @@ class MyGlRenderer(private val shapeType: String?) : GLSurfaceView.Renderer {
         Matrix.multiplyMM(combinedMatrix, 0, modelViewProjectionMatrix, 0, rotationMatrix, 0)
 
         // Draw shape
-        shape?.draw(combinedMatrix)
+        shape?.draw(combinedMatrix, context)
     }
 }

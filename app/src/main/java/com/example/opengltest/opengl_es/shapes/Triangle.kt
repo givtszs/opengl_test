@@ -1,5 +1,6 @@
 package com.example.opengltest.opengl_es.shapes
 
+import android.content.Context
 import android.opengl.GLES20
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -7,8 +8,12 @@ import java.nio.FloatBuffer
 
 class Triangle(
     shapeCoords: FloatArray,
+    textureCoords: FloatArray,
     color: FloatArray? = null
-) : OpenGLShape(shapeCoords) {
+) : OpenGLShape(shapeCoords, textureCoords) {
+    override fun loadGlTexture(context: Context) {
+        TODO("Not yet implemented")
+    }
 
     init {
         color?.let {
@@ -16,7 +21,7 @@ class Triangle(
         }
     }
 
-    override fun draw(mvpMatrix: FloatArray?) {
+    override fun draw(mvpMatrix: FloatArray?, context: Context) {
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(program)
 

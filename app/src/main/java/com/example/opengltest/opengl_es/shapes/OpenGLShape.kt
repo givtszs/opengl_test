@@ -1,5 +1,6 @@
 package com.example.opengltest.opengl_es.shapes
 
+import android.content.Context
 import android.opengl.GLES20
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -8,9 +9,11 @@ import java.nio.FloatBuffer
 const val COORDS_PER_VERTEX = 3
 
 abstract class OpenGLShape(
-    val coords: FloatArray
+    val coords: FloatArray,
+    val texture: FloatArray
 ) {
-    protected lateinit var vertexBuffer: FloatBuffer
+    protected var vertexBuffer: FloatBuffer
+    protected var textureBuffer: FloatBuffer
     var color: FloatArray = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
     protected var program: Int = 0
     protected var vertexCount: Int = 0
@@ -52,7 +55,6 @@ abstract class OpenGLShape(
             GLES20.glLinkProgram(program)
         }
 
-        // Feel float buffer
         vertexBuffer = ByteBuffer.allocateDirect(coords.size * 4).run {
             // use the device hardware's native byte order
             order(ByteOrder.nativeOrder())
@@ -62,6 +64,14 @@ abstract class OpenGLShape(
                 // add the coordinates to the FloatBuffer
                 put(coords)
                 // set the buffer to read the first coordinate
+                position(0)
+            }
+        }
+
+        textureBuffer = ByteBuffer.allocateDirect(coords.size * 4).run {
+            order(ByteOrder.nativeOrder())
+            asFloatBuffer().apply {
+                put(texture)
                 position(0)
             }
         }
@@ -77,7 +87,9 @@ abstract class OpenGLShape(
         }
     }
 
-    abstract fun draw(mvpMatrix: FloatArray? = null)
+    abstract fun draw(mvpMatrix: FloatArray? = null, context: Context)
+
+    abstract fun loadGlTexture(context: Context)
 
     override fun toString(): String {
         return """

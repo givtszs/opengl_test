@@ -18,8 +18,8 @@ class OpenGLActivity : AppCompatActivity() {
         supportActionBar?.title = shape
         setContentView(
             MyGLSurfaceView(
-                context = this,
-                renderer = MyGlRenderer(shape)
+                context = this@OpenGLActivity,
+                renderer = MyGlRenderer(shape,this@OpenGLActivity)
             )
         )
     }
