@@ -10,21 +10,6 @@ class Triangle(
     color: FloatArray? = null
 ) : OpenGLShape(shapeCoords) {
 
-    override var vertexBuffer: FloatBuffer =
-        // (number of coordinate values * 4 bytes per float)
-        ByteBuffer.allocateDirect(coords.size * 4).run {
-            // use the device hardware's native byte order
-            order(ByteOrder.nativeOrder())
-
-            // create a floating point buffer from the ByteBuffer
-            asFloatBuffer().apply {
-                // add the coordinates to the FloatBuffer
-                put(coords)
-                // set the buffer to read the first coordinate
-                position(0)
-            }
-        }
-
     init {
         color?.let {
             this.color = it
