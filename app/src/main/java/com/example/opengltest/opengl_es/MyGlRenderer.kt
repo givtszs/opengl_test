@@ -29,9 +29,6 @@ class MyGlRenderer(
     override fun onSurfaceCreated(p0: GL10?, p1: EGLConfig?) {
         // set the background frame color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
-//        GLES20.glEnable(GLES20.GL_TEXTURE_2D)
-//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 
         // initialize shape
         shape = when (shapeType) {
@@ -42,7 +39,11 @@ class MyGlRenderer(
                         -0.3f, -0.31100425f, 0.0f,
                         0.3f, -0.31100425f, 0.0f
                     ),
-                    textureCoords = floatArrayOf(),
+                    textureCoords = floatArrayOf(
+                        0.0f, 0.0f,    // bottom-left
+                        0.5f, 1.0f,    // top-center
+                        1.0f, 0.0f     // bottom-right
+                    ),
                     color = floatArrayOf(0.404f, 0.314f, 0.643f, 1.0f)
                 )
             }
@@ -68,8 +69,6 @@ class MyGlRenderer(
 
             else -> null
         }
-
-//        shape?.loadGlTexture(context)
     }
 
     override fun onSurfaceChanged(gL10: GL10?, width: Int, height: Int) {

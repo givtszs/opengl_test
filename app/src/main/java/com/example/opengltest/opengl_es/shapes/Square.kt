@@ -1,10 +1,7 @@
 package com.example.opengltest.opengl_es.shapes
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.opengl.GLES20
-import android.opengl.GLUtils
-import android.util.Log
 import com.example.opengltest.R
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -16,7 +13,6 @@ class Square(
     color: FloatArray? = null
 ) : OpenGLShape(shapeCoords, textureCoords) {
     private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3)
-    private val textures = IntArray(1)
 
     // byte buffer for the draw list
     private val drawListBuffer: ShortBuffer =
@@ -79,7 +75,7 @@ class Square(
 
         val textureUniformHandle = GLES20.glGetUniformLocation(program, "uTexture")
 
-        val textureId = loadGlTexture(context)
+        val textureId = loadGlTexture(context, R.drawable.tex_1)
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
         // Bind the texture and set the uniform sample2D in the shader program
@@ -103,42 +99,5 @@ class Square(
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(vertPositionHandle)
         GLES20.glDisableVertexAttribArray(texCoordinateHandle)
-    }
-
-    override fun loadGlTexture(context: Context): Int {
-//        GLES20.glEnable(GLES20.GL_BLEND)
-//        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glGenTextures(textures.size, textures, 0)
-
-        if (textures[0] != 0) {
-            // generate one texture pointer and bind it to the textures array
-//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0])
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST)
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT)
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT)
-            // use Android GLUtils to specify a two-dimensional texture image from our bitmap
-            val bitmap = BitmapFactory.decodeResource(
-                context.resources,
-                R.drawable.tex_1,
-                BitmapFactory.Options().apply {
-                    inScaled = false
-                }
-            )
-            Log.d("Bitmap", "Width: ${bitmap.width}, Height: ${bitmap.height}, Format: ${bitmap.config}")
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0)
-            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
-
-            // clean up
-            bitmap.recycle()
-        }
-
-        if (textures[0] == 0) {
-            throw RuntimeException("Error loading texture.")
-        }
-
-        return textures[0]
     }
 }

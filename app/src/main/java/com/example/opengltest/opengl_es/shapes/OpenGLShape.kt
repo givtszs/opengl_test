@@ -1,7 +1,12 @@
 package com.example.opengltest.opengl_es.shapes
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.opengl.GLES20
+import android.opengl.GLUtils
+import android.util.Log
+import androidx.annotation.DrawableRes
+import com.example.opengltest.R
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -95,7 +100,50 @@ abstract class OpenGLShape(
 
     abstract fun draw(mvpMatrix: FloatArray? = null, context: Context)
 
-    abstract fun loadGlTexture(context: Context): Int
+    protected fun loadGlTexture(context: Context, @DrawableRes imageId: Int): Int {
+        val textures = IntArray(1)
+        // Generate OpenGL texture IDs and store them in the 'textures' array
+        GLES20.glGenTextures(textures.size, textures, 0)
+
+        if (textures[0] != 0) {
+            // Activate texture unit 0
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+
+            // Bind the texture ID to the GL_TEXTURE_2D target
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0])
+
+            // Set texture filtering parameters for minification and magnification
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST)
+
+            // Set texture wrapping parameters for the S (horizontal) and T (vertical) directions
+            // to repeat texture if it does not fit in the whole face
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT)
+            // use Android GLUtils to specify a two-dimensional texture image from our bitmap
+            val bitmap = BitmapFactory.decodeResource(
+                context.resources,
+                imageId,
+                BitmapFactory.Options().apply {
+                    inScaled = false
+                }
+            )
+            Log.d("Bitmap", "Width: ${bitmap.width}, Height: ${bitmap.height}, Format: ${bitmap.config}")
+
+            // Load the bitmap data into the OpenGL texture at mipmap level 0 with RGBA format
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0)
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
+
+            // clean up
+            bitmap.recycle()
+        }
+
+        if (textures[0] == 0) {
+            throw RuntimeException("Error loading texture.")
+        }
+
+        return textures[0]
+    }
 
     override fun toString(): String {
         return """

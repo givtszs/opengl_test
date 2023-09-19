@@ -1,21 +1,14 @@
 package com.example.opengltest.opengl_es.shapes
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.opengl.GLES20
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.FloatBuffer
+import com.example.opengltest.R
 
 class Triangle(
     shapeCoords: FloatArray,
     textureCoords: FloatArray,
     color: FloatArray? = null
 ) : OpenGLShape(shapeCoords, textureCoords) {
-    override fun loadGlTexture(context: Context): Int {
-        TODO("Not yet implemented")
-    }
-
     init {
         color?.let {
             this.color = it
@@ -27,7 +20,7 @@ class Triangle(
         GLES20.glUseProgram(program)
 
         // get handle to vertex shader's vPosition member
-        GLES20.glGetAttribLocation(program, "vPosition").also {
+        val vertPositionHandle = GLES20.glGetAttribLocation(program, "vPosition").also {
 
             // Enable a handle to the triangle vertices
             GLES20.glEnableVertexAttribArray(it)
@@ -42,24 +35,44 @@ class Triangle(
                 vertexBuffer
             )
 
-            // get handle to fragment shader's vColor member
-            GLES20.glGetUniformLocation(program, "vColor").also { colorHandle ->
-
-                // Set color for drawing the triangle
-                GLES20.glUniform4fv(colorHandle, 1, color, 0)
-            }
-
-            // get handle to shape's transformation matrix
-            val vPMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
-
-            // Pass the projection and view transformation to the shader
-            GLES20.glUniformMatrix4fv(vPMatrixHandle, 1, false, mvpMatrix, 0)
-
-            // Draw the triangle
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
-
-            // Disable vertex array
-            GLES20.glDisableVertexAttribArray(it)
         }
+
+        val texCoordinateHandle = GLES20.glGetAttribLocation(program, "aTextureCoordinate").also {
+            // pass texture position to shader
+            GLES20.glVertexAttribPointer(
+                it,
+                TEXTURE_COORDS,
+                GLES20.GL_FLOAT,
+                false,
+                0, // auto stride because it's tightly packed
+                textureBuffer
+            )
+
+            GLES20.glEnableVertexAttribArray(it)
+        }
+
+        val textureUniformHandle = GLES20.glGetUniformLocation(program, "uTexture")
+
+        val textureId = loadGlTexture(context, R.drawable.tex_1)
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
+        // Bind the texture and set the uniform sample2D in the shader program
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+        GLES20.glUniform1i(textureUniformHandle, 0)
+
+        // get handle to shape's transformation matrix
+        val vPMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
+
+        // Pass the projection and view transformation to the shader
+        GLES20.glUniformMatrix4fv(vPMatrixHandle, 1, false, mvpMatrix, 0)
+
+
+        // Draw the triangle
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
+
+        // Disable vertex array
+        GLES20.glDisableVertexAttribArray(vertPositionHandle)
+        GLES20.glDisableVertexAttribArray(texCoordinateHandle)
+
     }
 }
