@@ -7,10 +7,11 @@ import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 const val COORDS_PER_VERTEX = 3
+const val TEXTURE_COORDS = 2
 
 abstract class OpenGLShape(
     val coords: FloatArray,
-    val texture: FloatArray
+    val textureCoords: FloatArray
 ) {
     protected var vertexBuffer: FloatBuffer
     protected var textureBuffer: FloatBuffer
@@ -24,18 +25,23 @@ abstract class OpenGLShape(
         // the coordinates of the objects that use this vertex shader
         "uniform mat4 uMVPMatrix;" +
         "attribute vec4 vPosition;" +
+        "attribute vec2 aTextureCoordinate;" + // Texture coordinates
+        "varying vec2 vTextureCoordinate;" + // Passed to fragment shader
         "void main() {" +
         // the matrix must be included as a modifier of gl_Position
         // Note that the uMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
-        "  gl_Position = uMVPMatrix * vPosition;" +
+        "   gl_Position = uMVPMatrix * vPosition;" +
+        "   vTextureCoordinate = aTextureCoordinate;" + // Pass texture coordinate
         "}"
 
     private val fragmentShaderCode =
         "precision mediump float;" +
         "uniform vec4 vColor;" +
+        "uniform sampler2D uTexture;" + // Texture sampler
+        "varying vec2 vTextureCoordinate;" + // Received from vertex shader
         "void main() {" +
-        "  gl_FragColor = vColor;" +
+        "  gl_FragColor = texture2D(uTexture, vTextureCoordinate);" +
         "}"
 
     init {
@@ -68,10 +74,10 @@ abstract class OpenGLShape(
             }
         }
 
-        textureBuffer = ByteBuffer.allocateDirect(coords.size * 4).run {
+        textureBuffer = ByteBuffer.allocateDirect(textureCoords.size * 4).run {
             order(ByteOrder.nativeOrder())
             asFloatBuffer().apply {
-                put(texture)
+                put(textureCoords)
                 position(0)
             }
         }
@@ -89,7 +95,7 @@ abstract class OpenGLShape(
 
     abstract fun draw(mvpMatrix: FloatArray? = null, context: Context)
 
-    abstract fun loadGlTexture(context: Context)
+    abstract fun loadGlTexture(context: Context): Int
 
     override fun toString(): String {
         return """

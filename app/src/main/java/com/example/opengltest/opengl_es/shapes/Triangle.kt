@@ -1,6 +1,7 @@
 package com.example.opengltest.opengl_es.shapes
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.opengl.GLES20
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -11,7 +12,7 @@ class Triangle(
     textureCoords: FloatArray,
     color: FloatArray? = null
 ) : OpenGLShape(shapeCoords, textureCoords) {
-    override fun loadGlTexture(context: Context) {
+    override fun loadGlTexture(context: Context): Int {
         TODO("Not yet implemented")
     }
 

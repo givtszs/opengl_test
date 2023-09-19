@@ -3,8 +3,8 @@ package com.example.opengltest.opengl_es.shapes
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
-import android.opengl.GLU
 import android.opengl.GLUtils
+import android.util.Log
 import com.example.opengltest.R
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -56,44 +56,41 @@ class Square(
             )
         }
 
-//        // get handle to fragment shader's vColor member
+        // get handle to fragment shader's vColor member
 //        GLES20.glGetUniformLocation(program, "vColor").also { colorHandle ->
 //
 //            // Set color for drawing the triangle
 //            GLES20.glUniform4fv(colorHandle, 1, color, 0)
 //        }
 
-        // texture position handler
-        val texPositionHandle = GLES20.glGetAttribLocation(program, "a_TexCoordinate").also {
+        val texCoordinateHandle = GLES20.glGetAttribLocation(program, "aTextureCoordinate").also {
             // pass texture position to shader
             GLES20.glVertexAttribPointer(
                 it,
-                COORDS_PER_VERTEX,
+                TEXTURE_COORDS,
                 GLES20.GL_FLOAT,
                 false,
-                vertexStride,
+                0, // auto stride because it's tightly packed
                 textureBuffer
             )
 
             GLES20.glEnableVertexAttribArray(it)
         }
 
-        // texture uniform handler
-        val textureUniformHandle = GLES20.glGetUniformLocation(program, "u_Texture")
+        val textureUniformHandle = GLES20.glGetUniformLocation(program, "uTexture")
+
+        val textureId = loadGlTexture(context)
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
+        // Bind the texture and set the uniform sample2D in the shader program
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+        GLES20.glUniform1i(textureUniformHandle, 0)
 
         // get handle to shape's transformation matrix
         val vPMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix")
 
         // Pass the projection and view transformation to the shader
         GLES20.glUniformMatrix4fv(vPMatrixHandle, 1, false, mvpMatrix, 0)
-
-        // load texture
-//        loadGlTexture(context)
-
-        // attach the object texture
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0])
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
-        GLES20.glUniform1i(textureUniformHandle, 0)
 
         // Draw the square
         GLES20.glDrawElements(
@@ -105,32 +102,43 @@ class Square(
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(vertPositionHandle)
-        GLES20.glDisableVertexAttribArray(texPositionHandle)
+        GLES20.glDisableVertexAttribArray(texCoordinateHandle)
     }
 
-    override fun loadGlTexture(context: Context) {
+    override fun loadGlTexture(context: Context): Int {
 //        GLES20.glEnable(GLES20.GL_BLEND)
 //        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-
-        // loading texture
-        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.polygonal_texture)
-
-        // generate one texture pointer and bind it to the textures array
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glGenTextures(textures.size, textures, 0)
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0])
 
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST.toFloat());
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST.toFloat());
+        if (textures[0] != 0) {
+            // generate one texture pointer and bind it to the textures array
+//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0])
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT)
+            // use Android GLUtils to specify a two-dimensional texture image from our bitmap
+            val bitmap = BitmapFactory.decodeResource(
+                context.resources,
+                R.drawable.tex_1,
+                BitmapFactory.Options().apply {
+                    inScaled = false
+                }
+            )
+            Log.d("Bitmap", "Width: ${bitmap.width}, Height: ${bitmap.height}, Format: ${bitmap.config}")
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, bitmap, 0)
+            GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
 
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+            // clean up
+            bitmap.recycle()
+        }
 
-        // use Android GLUtils to specify a two-dimensional texture image from our bitmap
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
-//        GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D)
+        if (textures[0] == 0) {
+            throw RuntimeException("Error loading texture.")
+        }
 
-        // clean up
-        bitmap.recycle()
+        return textures[0]
     }
 }

@@ -13,8 +13,9 @@ import com.example.opengltest.opengl_es.shapes.Triangle
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class MyGlRenderer(private val shapeType: String?,
-                   private val context: Context,
+class MyGlRenderer(
+    private val shapeType: String?,
+    private val context: Context,
 ) : GLSurfaceView.Renderer {
     private var shape: OpenGLShape? = null
     private val modelViewProjectionMatrix = FloatArray(16)
@@ -29,7 +30,7 @@ class MyGlRenderer(private val shapeType: String?,
         // set the background frame color
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f)
 //        GLES20.glEnable(GLES20.GL_TEXTURE_2D)
-        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 //        GLES20.glDepthFunc(GLES20.GL_LEQUAL);
 
         // initialize shape
@@ -56,10 +57,10 @@ class MyGlRenderer(private val shapeType: String?,
                     ),
                     textureCoords = floatArrayOf(
                         //x,    y
-                        0.0f, 1.0f,
                         0.0f, 0.0f,
-                        1.0f, 0.0f,
+                        0.0f, 1.0f,
                         1.0f, 1.0f,
+                        1.0f, 0.0f,
                     ),
                     color = floatArrayOf(0.404f, 0.314f, 0.643f, 1.0f)
                 )
@@ -68,7 +69,7 @@ class MyGlRenderer(private val shapeType: String?,
             else -> null
         }
 
-        shape?.loadGlTexture(context)
+//        shape?.loadGlTexture(context)
     }
 
     override fun onSurfaceChanged(gL10: GL10?, width: Int, height: Int) {
