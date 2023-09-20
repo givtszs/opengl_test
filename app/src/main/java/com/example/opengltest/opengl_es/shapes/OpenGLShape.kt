@@ -6,13 +6,13 @@ import android.opengl.GLES20
 import android.opengl.GLUtils
 import android.util.Log
 import androidx.annotation.DrawableRes
-import com.example.opengltest.R
+import com.example.opengltest.opengl_es.ShaderHelper
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 const val COORDS_PER_VERTEX = 3
-const val TEXTURE_COORDS = 2
+const val TEXTURE_COORDS_SIZE = 2
 
 abstract class OpenGLShape(
     val coords: FloatArray,
@@ -51,20 +51,11 @@ abstract class OpenGLShape(
 
     init {
         vertexCount = coords.size / COORDS_PER_VERTEX
-        val vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
-        val fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
+        val vertexShader = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
+        val fragmentShader = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
 
         // Create empty OpenGL ES Program
-        program = GLES20.glCreateProgram().also { program ->
-            // add the vertex shader to program
-            GLES20.glAttachShader(program, vertexShader)
-
-            // add the fragment shader to program
-            GLES20.glAttachShader(program, fragmentShader)
-
-            // create OpenGL ES program executables
-            GLES20.glLinkProgram(program)
-        }
+        program = ShaderHelper.createAndLinkProgram(vertexShader, fragmentShader)
 
         vertexBuffer = ByteBuffer.allocateDirect(coords.size * 4).run {
             // use the device hardware's native byte order
@@ -85,16 +76,6 @@ abstract class OpenGLShape(
                 put(textureCoords)
                 position(0)
             }
-        }
-    }
-
-    private fun loadShader(type: Int, shaderCode: String): Int {
-        // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
-        // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
-        return GLES20.glCreateShader(type).also { shader ->
-            // add the source code to the shader and compile it
-            GLES20.glShaderSource(shader, shaderCode)
-            GLES20.glCompileShader(shader)
         }
     }
 

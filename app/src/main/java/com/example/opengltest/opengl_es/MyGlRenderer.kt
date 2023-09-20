@@ -4,7 +4,6 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
-import android.os.SystemClock
 import android.util.Log
 import com.example.opengltest.opengl_es.shapes.OpenGLShape
 import com.example.opengltest.opengl_es.shapes.Shapes
@@ -66,7 +65,6 @@ class MyGlRenderer(
                     color = floatArrayOf(0.404f, 0.314f, 0.643f, 1.0f)
                 )
             }
-
             else -> null
         }
     }

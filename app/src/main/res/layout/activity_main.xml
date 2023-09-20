@@ -57,5 +57,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvHeader1" />
 
+    <TextView
+        android:id="@+id/tvHeader2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="or"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@id/btnDrawCube"
+        app:layout_constraintEnd_toEndOf="@id/btnDrawTriangle"
+        app:layout_constraintStart_toStartOf="@id/btnDrawTriangle"
+        app:layout_constraintTop_toBottomOf="@id/btnDrawSquare" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDrawCube"
+        android:layout_width="@dimen/btn_width"
+        android:layout_height="wrap_content"
+        android:insetTop="0dp"
+        android:layout_marginTop="8dp"
+        android:textAllCaps="false"
+        android:textSize="20sp"
+        android:insetBottom="0dp"
+        android:text="Cube"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvHeader2" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

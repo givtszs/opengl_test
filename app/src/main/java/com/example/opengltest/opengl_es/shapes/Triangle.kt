@@ -41,7 +41,7 @@ class Triangle(
             // pass texture position to shader
             GLES20.glVertexAttribPointer(
                 it,
-                TEXTURE_COORDS,
+                TEXTURE_COORDS_SIZE,
                 GLES20.GL_FLOAT,
                 false,
                 0, // auto stride because it's tightly packed

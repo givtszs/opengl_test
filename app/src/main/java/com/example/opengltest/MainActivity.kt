@@ -3,6 +3,7 @@ package com.example.opengltest
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.example.opengltest.databinding.ActivityMainBinding
 import com.example.opengltest.opengl_es.shapes.Shapes
 
@@ -13,17 +14,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnDrawTriangle.setOnClickListener {
-            Intent(this@MainActivity, OpenGLActivity::class.java).also {
-                it.putExtra(EXTRA_SHAPE, Shapes.TRIANGLE.shapeName)
-                startActivity(it)
-            }
+            onClickListener(Shapes.TRIANGLE.shapeName)
         }
 
         binding.btnDrawSquare.setOnClickListener {
-            Intent(this@MainActivity, OpenGLActivity::class.java).also {
-                it.putExtra(EXTRA_SHAPE, Shapes.SQUARE.shapeName)
-                startActivity(it)
-            }
+            onClickListener(Shapes.SQUARE.shapeName)
+        }
+
+        binding.btnDrawCube.setOnClickListener {
+           onClickListener(Shapes.CUBE.shapeName)
+        }
+    }
+
+    private fun onClickListener(shape: String) {
+        Intent(this@MainActivity, OpenGLActivity::class.java).also {
+            it.putExtra(EXTRA_SHAPE, shape)
+            startActivity(it)
         }
     }
 
