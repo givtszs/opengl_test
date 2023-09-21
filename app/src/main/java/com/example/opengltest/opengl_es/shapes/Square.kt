@@ -7,11 +7,21 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.ShortBuffer
 
-class Square(
-    shapeCoords: FloatArray,
-    textureCoords: FloatArray,
-    color: FloatArray? = null
-) : OpenGLShape(shapeCoords, textureCoords) {
+class Square : OpenGLShape(
+    coords = floatArrayOf(
+        -0.3f, 0.3f, 0.0f,    // top left
+        -0.3f, -0.3f, 0.0f,   // bottom left
+        0.3f, -0.3f, 0.0f,    // bottom right
+        0.3f, 0.3f, 0.0f      // top right
+    ),
+    textureCoords = floatArrayOf(
+        //x,    y
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+    )
+) {
     private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3)
 
     // byte buffer for the draw list
@@ -25,13 +35,7 @@ class Square(
             }
         }
 
-    init {
-        color?.let {
-            this.color = it
-        }
-    }
-
-    override fun draw(mvpMatrix: FloatArray?, context: Context) {
+    override fun draw(mvpMatrix: FloatArray, context: Context) {
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(program)
 

@@ -1,16 +1,11 @@
 package com.example.opengltest
 
-import android.app.Activity
-import android.graphics.Insets
-import android.os.Build
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.Log
-import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
-import com.example.opengltest.opengl_es.CubeGlRenderer
+import com.example.opengltest.opengl_es.renderers.CubeGlRenderer
 import com.example.opengltest.opengl_es.MyGLSurfaceView
-import com.example.opengltest.opengl_es.MyGlRenderer
+import com.example.opengltest.opengl_es.renderers.MyGlRenderer
 import com.example.opengltest.opengl_es.shapes.Shapes
 
 
@@ -26,7 +21,7 @@ class OpenGLActivity : AppCompatActivity() {
                 renderer = if (shape != Shapes.CUBE.shapeName) {
                     MyGlRenderer(shape,this@OpenGLActivity)
                 } else {
-                    CubeGlRenderer()
+                    CubeGlRenderer(this@OpenGLActivity)
                 }
             )
         )

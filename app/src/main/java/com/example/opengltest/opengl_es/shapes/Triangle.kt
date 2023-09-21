@@ -4,18 +4,19 @@ import android.content.Context
 import android.opengl.GLES20
 import com.example.opengltest.R
 
-class Triangle(
-    shapeCoords: FloatArray,
-    textureCoords: FloatArray,
-    color: FloatArray? = null
-) : OpenGLShape(shapeCoords, textureCoords) {
-    init {
-        color?.let {
-            this.color = it
-        }
-    }
-
-    override fun draw(mvpMatrix: FloatArray?, context: Context) {
+class Triangle : OpenGLShape(
+    coords = floatArrayOf(
+        0.0f, 0.31100425f, 0.0f,
+        -0.3f, -0.31100425f, 0.0f,
+        0.3f, -0.31100425f, 0.0f
+    ),
+    textureCoords = floatArrayOf(
+        0.0f, 0.0f,    // bottom-left
+        0.5f, 1.0f,    // top-center
+        1.0f, 0.0f     // bottom-right
+    )
+) {
+    override fun draw(mvpMatrix: FloatArray, context: Context) {
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(program)
 

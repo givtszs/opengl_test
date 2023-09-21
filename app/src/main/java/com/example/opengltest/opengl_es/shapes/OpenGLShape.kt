@@ -79,7 +79,7 @@ abstract class OpenGLShape(
         }
     }
 
-    abstract fun draw(mvpMatrix: FloatArray? = null, context: Context)
+    abstract fun draw(mvpMatrix: FloatArray, context: Context)
 
     protected fun loadGlTexture(context: Context, @DrawableRes imageId: Int): Int {
         val textures = IntArray(1)
