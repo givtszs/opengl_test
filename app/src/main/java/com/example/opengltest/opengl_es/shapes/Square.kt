@@ -12,17 +12,6 @@ class Square(
 ) : OpenGLShape(shapeCoords) {
     private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3)
 
-    // vertex byte buffer for shape coordinates
-    override var vertexBuffer: FloatBuffer =
-        // (# of coordinate values * 4 bytes per float)
-        ByteBuffer.allocateDirect(coords.size * 4).run {
-            order(ByteOrder.nativeOrder())
-            asFloatBuffer().apply {
-                put(coords)
-                position(0)
-            }
-        }
-
     // byte buffer for the draw list
     private val drawListBuffer: ShortBuffer =
         // (# of coordinate values * 2 bytes per short)
