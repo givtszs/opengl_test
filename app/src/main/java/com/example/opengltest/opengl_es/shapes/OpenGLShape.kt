@@ -1,6 +1,8 @@
 package com.example.opengltest.opengl_es.shapes
 
 import android.opengl.GLES20
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 const val COORDS_PER_VERTEX = 3
@@ -8,11 +10,19 @@ const val COORDS_PER_VERTEX = 3
 abstract class OpenGLShape(
     val coords: FloatArray
 ) {
-    protected abstract var vertexBuffer: FloatBuffer
     var color: FloatArray = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
     protected var program: Int = 0
     protected var vertexCount: Int = 0
     protected val vertexStride: Int = COORDS_PER_VERTEX * 4
+    protected var vertexBuffer: FloatBuffer =
+        // (# of coordinate values * 4 bytes per float)
+        ByteBuffer.allocateDirect(coords.size * 4).run {
+            order(ByteOrder.nativeOrder())
+            asFloatBuffer().apply {
+                put(coords)
+                position(0)
+            }
+        }
 
     private val vertexShaderCode =
         // This matrix member variable provides a hook to manipulate
